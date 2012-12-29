@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.sbs"
-  name="SBS Test"
-  version="0.4"
+<addon id="plugin.video.sbsondemand"
+  name="SBS On Demand"
+  version="0.0"
   provider-name="ye">
   <requires>
     <import addon="xbmc.python" version="1.0"/>
@@ -11,10 +11,10 @@
     <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary>Test SBS</summary>
-    <description>Test SBS</description>
+    <summary>SBS On Demand</summary>
+    <description>Watch SBS On Demand</description>
     <platform>all</platform>
-    <disclaimer>Some videos may not play. Please record any videos not playing, save the xbmc debug log, and email stacked.xbmc@gmail.com.</disclaimer>
+    <disclaimer></disclaimer>
   </extension>
 </addon>
 

@@ -1,0 +1,3 @@
+[submodule "resources/lib/sbsOnDemand"]
+	path = resources/lib/sbsOnDemand
+	url = git@github.com:yec/sbsOnDemand.git

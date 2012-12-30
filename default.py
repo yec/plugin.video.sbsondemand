@@ -6,9 +6,17 @@ sys.path.append(_curDir + '/resources/lib/sbsOnDemand/')
 
 import SbsOnDemand.config
 import SbsOnDemand.Feed
+import SbsOnDemand.Video
 
 _thisPlugin = int(sys.argv[1])
 _scheme = 'plugin://plugin.video.sbsondemand/'
+
+class Config(object):
+    """ Use bitrate less than this """
+    MAX_BITRATE = 300000
+
+class Resource(object):
+    IMAGE_PLACEHOLDER = os.path.dirname(__file__) + '/resources/media/placeholder.gif'
 
 def routes(url):
     global _scheme
@@ -18,7 +26,7 @@ def routes(url):
         view_feeds(url)
     elif re.search('category/.*', path):
         view_shows(path)
-    else:
+    elif re.search('play/.*', path):
         play_video(url)
 
 def view_feeds(url):
@@ -33,21 +41,35 @@ def view_feeds(url):
 
 def view_shows(url):
     global _thisPlugin
+    global _scheme
 
     m = re.search('category/(.+)', url)
     feedname = m.group(1)
     feed = SbsOnDemand.Feed.getFeedFromId(feedname)
     for video in feed.getVideos(itemsPerPage=feed.totalResults):
-        li = xbmcgui.ListItem(video.title)
-        xbmcplugin.addDirectoryItem(_thisPlugin, video.url, li)
+        li = xbmcgui.ListItem(video.title, thumbnailImage=video.thumbnail, iconImage=Resource.IMAGE_PLACEHOLDER)
+        li.setInfo( 'video', { 'Title':video.title, 'Plot': video.description } )
+        xbmcplugin.addDirectoryItem(_thisPlugin, _scheme + '/play/' + video.id , li, isFolder=False, totalItems=feed.totalResults)
 
     xbmcplugin.endOfDirectory(_thisPlugin)
 
 def play_video(url):
     global _thisPlugin
+
     ok = True
-    xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(url)
+    m = re.search('play/(.+)', url)
+    videoId = m.group(1)
+    video = SbsOnDemand.Video.getVideo(videoId)
+    media = _media_with_max_bitrate(video, Config.MAX_BITRATE)
+    mediaurl = media.videoUrl
+    print mediaurl
+    xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(mediaurl)
     return ok
 
+def _media_with_max_bitrate(video, bitrate):
+    media_content = filter(lambda x: x.bitrate < Config.MAX_BITRATE, video.media['content'])
+    for media in sorted(media_content, key=lambda x: x.bitrate, reverse=True):
+        return media
+    return None
 
 routes(sys.argv[0])

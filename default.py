@@ -37,7 +37,7 @@ def view_shows(url):
     m = re.search('category/(.+)', url)
     feedname = m.group(1)
     feed = SbsOnDemand.Feed.getFeedFromId(feedname)
-    for video in feed.getVideos():
+    for video in feed.getVideos(itemsPerPage=feed.totalResults):
         li = xbmcgui.ListItem(video.title)
         xbmcplugin.addDirectoryItem(_thisPlugin, video.url, li)
 

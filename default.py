@@ -18,11 +18,12 @@ def routes(url):
         view_feeds(url)
     elif re.search('category/.*', path):
         view_shows(path)
+    else:
+        play_video(url)
 
 def view_feeds(url):
     global _thisPlugin
 
-    a = [{ 'name' : 'Programs', 'feedId': 'section-programs' }]
     for item in SbsOnDemand.config.DEFAULT_FEEDS:
         li = xbmcgui.ListItem(item['name'])
         isfolder = True
@@ -41,6 +42,12 @@ def view_shows(url):
         xbmcplugin.addDirectoryItem(_thisPlugin, video.url, li)
 
     xbmcplugin.endOfDirectory(_thisPlugin)
+
+def play_video(url):
+    global _thisPlugin
+    ok = True
+    xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(url)
+    return ok
 
 
 routes(sys.argv[0])

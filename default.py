@@ -13,7 +13,7 @@ _scheme = 'plugin://plugin.video.sbsondemand/'
 
 class Config(object):
     """ Use bitrate less than this """
-    MAX_BITRATE = 300000
+    MAX_BITRATE = 600000
 
 class Resource(object):
     IMAGE_PLACEHOLDER = os.path.dirname(__file__) + '/resources/media/placeholder.gif'
@@ -59,10 +59,11 @@ def play_video(url):
     ok = True
     m = re.search('play/(.+)', url)
     videoId = m.group(1)
+    print 'Video ID: ' + videoId
     video = SbsOnDemand.Video.getVideo(videoId)
     media = _media_with_max_bitrate(video, Config.MAX_BITRATE)
     mediaurl = media.videoUrl
-    print mediaurl
+    print 'Media : {0} : {1}'.format(media.bitrate, mediaurl)
     xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(mediaurl)
     return ok
 

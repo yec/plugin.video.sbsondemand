@@ -35,7 +35,11 @@ def view_feeds(url):
     for item in SbsOnDemand.config.DEFAULT_FEEDS:
         li = xbmcgui.ListItem(item['name'])
         isfolder = True
-        xbmcplugin.addDirectoryItem(_thisPlugin, url + 'category/' + item['feedId'], li, isfolder)
+        print item
+        if item.has_key('url'):
+            xbmcplugin.addDirectoryItem(_thisPlugin, url + 'category/url/' + urllib.quote(item['url']), li, isfolder)
+        elif item.has_key('feedId'):
+            xbmcplugin.addDirectoryItem(_thisPlugin, url + 'category/feed/' + item['feedId'], li, isfolder)
 
     xbmcplugin.endOfDirectory(_thisPlugin)
 
@@ -43,9 +47,16 @@ def view_shows(url):
     global _thisPlugin
     global _scheme
 
-    m = re.search('category/(.+)', url)
-    feedname = m.group(1)
-    feed = SbsOnDemand.Feed.getFeedFromId(feedname)
+    m = re.search('category/(.+?)/(.+)', url)
+    feedtype = m.group(1)
+    feed = None
+    if feedtype == 'feed':
+        feedname = m.group(2)
+        feed = SbsOnDemand.Feed.getFeedFromId(feedname)
+    elif feedtype == 'url':
+        url = urllib.unquote(m.group(2))
+        feed = SbsOnDemand.Feed.getFeedFromUrl(url)
+
     for video in feed.getVideos(itemsPerPage=feed.totalResults):
         li = xbmcgui.ListItem(video.title, thumbnailImage=video.thumbnail, iconImage=Resource.IMAGE_PLACEHOLDER)
         li.setInfo( 'video', { 'Title':video.title, 'Plot': video.description } )

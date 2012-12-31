@@ -58,8 +58,9 @@ def view_shows(url):
         feed = SbsOnDemand.Feed.getFeedFromUrl(url)
 
     for video in feed.getVideos(itemsPerPage=feed.totalResults):
+        infoLabels = { 'title':video.title, 'plot': video.description }
         li = xbmcgui.ListItem(video.title, thumbnailImage=video.thumbnail, iconImage=Resource.IMAGE_PLACEHOLDER)
-        li.setInfo( 'video', { 'Title':video.title, 'Plot': video.description } )
+        li.setInfo( 'video', infoLabels )
         xbmcplugin.addDirectoryItem(_thisPlugin, _scheme + '/play/' + video.id , li, isFolder=False, totalItems=feed.totalResults)
 
     xbmcplugin.endOfDirectory(_thisPlugin)
@@ -75,7 +76,11 @@ def play_video(url):
     media = _media_with_max_bitrate(video, Config.MAX_BITRATE)
     mediaurl = media.videoUrl
     print 'Media : {0} : {1}'.format(media.bitrate, mediaurl)
-    xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(mediaurl)
+    infoLabels = { 'title':video.title, 'plot': video.description }
+    li = xbmcgui.ListItem(video.title, thumbnailImage=video.thumbnail, iconImage=Resource.IMAGE_PLACEHOLDER)
+    li.setInfo( 'video', infoLabels )
+    li.setProperty('IsPlayable', 'true')
+    xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(mediaurl, li)
     return ok
 
 def _media_with_max_bitrate(video, bitrate):
